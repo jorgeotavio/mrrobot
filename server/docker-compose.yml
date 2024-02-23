@@ -7,3 +7,5 @@ services:
     environment:
       - FLASK_ENV=development
     command: python app.py
+    volumes:
+      - ./data:/app/data

@@ -19,6 +19,7 @@ model = SimpleRegressor()
 @app.route('/train', methods=['GET'])
 def train():
     X, y = load_and_prepare_data('enemies_data.txt')
+
     dataset = TensorDataset(X, y)
     train_loader = DataLoader(dataset=dataset, batch_size=64, shuffle=True)
 
@@ -34,24 +35,24 @@ def train():
             loss.backward()
             optimizer.step()
 
-    torch.save(model.state_dict(), 'simple_regressor.pth')
-    return jsonify({'message': 'Model trained and saved'})
+    torch.save(model.state_dict(), 'data/result.pth')
+    return jsonify({'message': ''})
 
 @app.route('/predict', methods=['GET'])
 def predict():
-    model.load_state_dict(torch.load('simple_regressor.pth'))
+    model.load_state_dict(torch.load('data/result.pth'))
     model.eval()
 
     try:
         data = request.args
-        enemyX = float(data.get('enemyX'))
-        enemyY = float(data.get('enemyY'))
-        myX = float(data.get('myX'))
-        myY = float(data.get('myY'))
+        enemyX = round(float(data.get('enemyX').replace(',', '.')), 2)
+        enemyY = round(float(data.get('enemyY').replace(',', '.')), 2)
+        myX = round(float(data.get('myX').replace(',', '.')), 2)
+        myY = round(float(data.get('myY').replace(',', '.')), 2)
         inputs = torch.tensor([[enemyX, enemyY, myX, myY]], dtype=torch.float32)
         with torch.no_grad():
             prediction = model(inputs)
-        return jsonify({'nextEnemyX': prediction[0][0].item(), 'nextEnemyY': prediction[0][1].item()})
+        return prediction[0][0].item()+","+prediction[0][1].item()
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
