@@ -36,7 +36,29 @@ def train():
             optimizer.step()
 
     torch.save(model.state_dict(), 'data/result.pth')
-    return jsonify({'message': ''})
+    return jsonify({'message': 'Treinada'})
+
+@app.route('/validate', methods=['GET'])
+def validate():
+    X_val, y_val = load_and_prepare_data('enemies_data_validate.txt')
+    val_dataset = TensorDataset(X_val, y_val)
+    val_loader = DataLoader(dataset=val_dataset, batch_size=64, shuffle=False)
+
+    model.load_state_dict(torch.load('data/result.pth'))
+    model.eval()
+
+    total_loss = 0.0
+    criterion = nn.MSELoss()
+
+    with torch.no_grad():
+        for inputs, targets in val_loader:
+            outputs = model(inputs)
+            loss = criterion(outputs, targets)
+            total_loss += loss.item()
+
+    avg_loss = total_loss / len(val_loader)
+
+    return jsonify({'average_loss': avg_loss})
 
 @app.route('/predict', methods=['GET'])
 def predict():
@@ -52,7 +74,7 @@ def predict():
         inputs = torch.tensor([[enemyX, enemyY, myX, myY]], dtype=torch.float32)
         with torch.no_grad():
             prediction = model(inputs)
-        return prediction[0][0].item()+","+prediction[0][1].item()
+        return str(prediction[0][0].item())+","+str(prediction[0][1].item())
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 

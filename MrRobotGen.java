@@ -12,7 +12,7 @@ import java.util.List;
 
 import mrrobot.resources.Utils;
 
-public class MrRobot extends AdvancedRobot {
+public class MrRobotGen extends AdvancedRobot {
 	int dist = 50;
 
 	public void run() {
@@ -26,49 +26,15 @@ public class MrRobot extends AdvancedRobot {
 		double enemyDistance = e.getDistance();
 		double myX = getX();
 		double myY = getY();
-
+	
 		Utils.logData(enemyDistance, enemyAngle, myX, myY);
 		if (enemyDistance < 50 && getEnergy() > 50) {
 			fire(3);
 		} else {
 			fire(1);
 		}
-
-		double[] enemyPosition = Utils.calculateEnemyPosition(enemyDistance, enemyAngle, myX, myY);
-
-		HttpClient client = HttpClient.newHttpClient();
-		String url = String.format("http://localhost:5000/predict?enemyX=%f&enemyY=%f&myX=%f&myY=%f",
-				enemyPosition[0],
-				enemyPosition[1],
-				myX,
-				myY);
-
-		HttpRequest request = HttpRequest.newBuilder()
-				.uri(URI.create(url))
-				.build();
-
-		try {
-			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-			String[] parts = response.body().split(",");
-			if (parts.length == 2) {
-				double nextEnemyX = Double.parseDouble(parts[0]);
-				double nextEnemyY = Double.parseDouble(parts[1]);
-
-				// Calcula o ângulo para a posição prevista
-				double angleToPredictedEnemy = absoluteBearing(myX, myY, nextEnemyX, nextEnemyY) - getGunHeading();
-
-				// Ajusta a arma na direção do inimigo previsto
-				turnGunRight(normalizeBearing(angleToPredictedEnemy));
-
-				fire(1);
-			}
-
-		} catch (IOException | InterruptedException ex) {
-			System.err.println("Erro ao fazer a chamada HTTP: " + ex.getMessage());
-		}
-
-		// scan();
+		
+		scan();
 	}
 
 	public void onHitByBullet(HitByBulletEvent e) {

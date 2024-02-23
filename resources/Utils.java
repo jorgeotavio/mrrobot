@@ -8,38 +8,35 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataLogger {
+public class Utils {
     private static final List<String> dataRoundLines = new ArrayList<>();
     private static final String CSV_FILE = "enemies_data.txt";
     private static final String LOG_FILE = "log.txt";
 
-    public static double[] calculateEnemyPosition(double enemyDistance, double enemyAngle, double myX, double myY) {
-        double enemyAngleRadians = Math.toRadians(enemyAngle);
-
-        double enemyX = myX + enemyDistance * Math.sin(enemyAngleRadians);
-        double enemyY = myY + enemyDistance * Math.cos(enemyAngleRadians);
-
-        return new double[] { enemyX, enemyY };
+    public static double roundToTwoDecimalPlaces(double value) {
+        return Math.round(value * 100.0) / 100.0;
     }
-
+    
+    public static double[] calculateEnemyPosition(double enemyDistance, double enemyAngle, double myX, double myY) {
+        // Este é um método stub. Substitua pela lógica de cálculo real da posição do inimigo.
+        return new double[]{myX + enemyDistance * Math.cos(Math.toRadians(enemyAngle)), myY + enemyDistance * Math.sin(Math.toRadians(enemyAngle))};
+    }
+    
     public static void logData(double enemyDistance, double enemyAngle, double myX, double myY) {
-
+    
         double[] enemyPosition = calculateEnemyPosition(enemyDistance, enemyAngle, myX, myY);
-
+    
         double[] line = { enemyPosition[0], enemyPosition[1], myX, myY };
-        double lastItem = line[line.length - 1];
-
+    
         StringBuilder sb = new StringBuilder();
-
-        for (double item : line) {
-            
-            if (item == lastItem) {
-                sb.append(roundToTwoDecimalPlaces(item));
-            } else {
-                sb.append(roundToTwoDecimalPlaces(item) + ",");
+    
+        for (int i = 0; i < line.length; i++) {
+            sb.append(roundToTwoDecimalPlaces(line[i]));
+            if (i < line.length - 1) {
+                sb.append(",");
             }
         }
-
+    
         dataRoundLines.add(sb.toString());
     }
 
@@ -53,7 +50,7 @@ public class DataLogger {
         }
     }
 
-    public static void writeDataToFile() {
+    public static void writeDataToDataset() {
         try (RobocodeFileOutputStream rfos = new RobocodeFileOutputStream(CSV_FILE, true);
                 PrintWriter pw = new PrintWriter(rfos)) {
             for (String line : dataRoundLines) {
@@ -70,10 +67,19 @@ public class DataLogger {
         dataRoundLines.clear();
     }
 
-    public static double roundToTwoDecimalPlaces(double value) {
-        BigDecimal bd = new BigDecimal(Double.toString(value));
-        bd = bd.setScale(2, RoundingMode.HALF_UP);
-        return bd.doubleValue();
-    }
+    // public static double[] calculateEnemyPosition(double enemyDistance, double enemyAngle, double myX, double myY) {
+    //     double enemyAngleRadians = Math.toRadians(enemyAngle);
+
+    //     double enemyX = myX + enemyDistance * Math.sin(enemyAngleRadians);
+    //     double enemyY = myY + enemyDistance * Math.cos(enemyAngleRadians);
+
+    //     return new double[] { enemyX, enemyY };
+    // }
+
+    // public static double roundToTwoDecimalPlaces(double value) {
+    //     BigDecimal bd = new BigDecimal(Double.toString(value));
+    //     bd = bd.setScale(2, RoundingMode.HALF_UP);
+    //     return bd.doubleValue();
+    // }
 
 }
