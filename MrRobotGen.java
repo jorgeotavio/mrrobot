@@ -42,7 +42,7 @@ public class MrRobotGen extends AdvancedRobot {
 
 		ahead(dist);
 		dist *= -1;
-		// scan();
+		scan();
 	}
 
 	public void onHitRobot(HitRobotEvent e) {
@@ -54,32 +54,5 @@ public class MrRobotGen extends AdvancedRobot {
 
 	public void onRoundEnded(RoundEndedEvent event) {
 		Utils.writeDataToDataset();
-	}
-
-	// Metodo para calcular o ângulo absoluto para o inimigo previsto
-	double absoluteBearing(double x1, double y1, double x2, double y2) {
-		double xo = x2 - x1;
-		double yo = y2 - y1;
-		// valcula a hipotenusa diretamente
-		double hyp = Math.sqrt(xo * xo + yo * yo);
-		// usa Math.atan2 para obter o ângulo em radianos e depois converte para graus
-		double arcTan = Math.toDegrees(Math.atan2(xo, yo));
-		
-		// ajusa o angulo para que esteja no intervalo correto [0, 360)
-		double bearing = arcTan;
-		if (bearing < 0) {
-			bearing += 360;
-		}
-	
-		return bearing;
-	}
-
-	// Metodo para normalizar o ângulo
-	double normalizeBearing(double angle) {
-		while (angle > 180)
-			angle -= 360;
-		while (angle < -180)
-			angle += 360;
-		return angle;
 	}
 }
