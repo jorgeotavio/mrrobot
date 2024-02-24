@@ -3,14 +3,10 @@ package mrrobot;
 import robocode.*;
 import static robocode.util.Utils.normalRelativeAngleDegrees;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.List;
-
-import mrrobot.resources.Utils;
 
 public class MrRobot extends AdvancedRobot {
 	int dist = 50;
@@ -27,14 +23,14 @@ public class MrRobot extends AdvancedRobot {
 		double myX = getX();
 		double myY = getY();
 
-		Utils.logData(enemyDistance, enemyAngle, myX, myY);
+		// Utils.logData(enemyDistance, enemyAngle, myX, myY);
 		if (enemyDistance < 50 && getEnergy() > 50) {
 			fire(3);
 		} else {
 			fire(1);
 		}
 
-		double[] enemyPosition = Utils.calculateEnemyPosition(enemyDistance, enemyAngle, myX, myY);
+		double[] enemyPosition = calculateEnemyPosition(enemyDistance, enemyAngle, myX, myY);
 
 		HttpClient client = HttpClient.newHttpClient();
 		String url = String.format("http://localhost:5000/predict?enemyX=%f&enemyY=%f&myX=%f&myY=%f",
@@ -64,7 +60,7 @@ public class MrRobot extends AdvancedRobot {
 				fire(1);
 			}
 
-		} catch (IOException | InterruptedException ex) {
+		} catch (Exception ex) {
 			System.err.println("Erro ao fazer a chamada HTTP: " + ex.getMessage());
 		}
 
@@ -86,20 +82,20 @@ public class MrRobot extends AdvancedRobot {
 		fire(3);
 	}
 
-	public void onRoundEnded(RoundEndedEvent event) {
-		Utils.writeDataToDataset();
-	}
+	// public void onRoundEnded(RoundEndedEvent event) {
+	// 	Utils.writeDataToDataset();
+	// }
+
+	public static double[] calculateEnemyPosition(double enemyDistance, double enemyAngle, double myX, double myY) {
+        return new double[]{myX + enemyDistance * Math.cos(Math.toRadians(enemyAngle)), myY + enemyDistance * Math.sin(Math.toRadians(enemyAngle))};
+    }
 
 	// Metodo para calcular o ângulo absoluto para o inimigo previsto
 	double absoluteBearing(double x1, double y1, double x2, double y2) {
 		double xo = x2 - x1;
 		double yo = y2 - y1;
-		// valcula a hipotenusa diretamente
-		double hyp = Math.sqrt(xo * xo + yo * yo);
-		// usa Math.atan2 para obter o ângulo em radianos e depois converte para graus
 		double arcTan = Math.toDegrees(Math.atan2(xo, yo));
 		
-		// ajusa o angulo para que esteja no intervalo correto [0, 360)
 		double bearing = arcTan;
 		if (bearing < 0) {
 			bearing += 360;

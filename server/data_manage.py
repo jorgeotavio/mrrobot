@@ -1,7 +1,6 @@
 import torch
 import numpy as np
 
-# Carregar e preparar os dados
 def load_and_prepare_data(filename):
     with open(filename, 'r') as file:
         content = file.read()

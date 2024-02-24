@@ -18,7 +18,6 @@ public class Utils {
     }
     
     public static double[] calculateEnemyPosition(double enemyDistance, double enemyAngle, double myX, double myY) {
-        // Este é um método stub. Substitua pela lógica de cálculo real da posição do inimigo.
         return new double[]{myX + enemyDistance * Math.cos(Math.toRadians(enemyAngle)), myY + enemyDistance * Math.sin(Math.toRadians(enemyAngle))};
     }
     
@@ -57,7 +56,6 @@ public class Utils {
                 pw.println(line);
             }
 
-            // when the round is finished we add "&,&,&,&" to identify it
             pw.println("&,&,&,&");
 
             pw.flush();
@@ -66,20 +64,5 @@ public class Utils {
         }
         dataRoundLines.clear();
     }
-
-    // public static double[] calculateEnemyPosition(double enemyDistance, double enemyAngle, double myX, double myY) {
-    //     double enemyAngleRadians = Math.toRadians(enemyAngle);
-
-    //     double enemyX = myX + enemyDistance * Math.sin(enemyAngleRadians);
-    //     double enemyY = myY + enemyDistance * Math.cos(enemyAngleRadians);
-
-    //     return new double[] { enemyX, enemyY };
-    // }
-
-    // public static double roundToTwoDecimalPlaces(double value) {
-    //     BigDecimal bd = new BigDecimal(Double.toString(value));
-    //     bd = bd.setScale(2, RoundingMode.HALF_UP);
-    //     return bd.doubleValue();
-    // }
 
 }

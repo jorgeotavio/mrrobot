@@ -8,4 +8,4 @@ services:
       - FLASK_ENV=development
     command: python app.py
     volumes:
-      - .:/app
+      - .:/usr/src/app

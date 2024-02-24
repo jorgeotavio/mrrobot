@@ -5,20 +5,26 @@ from torch.utils.data import DataLoader, TensorDataset
 from flask import Flask, request, jsonify
 from data_manage import load_and_prepare_data
 
+DATASET_FILE = 'datasets/enemies_data.txt'
+DATASET_VALIDATE_FILE = 'datasets/enemies_data_validate.txt'
+RESULT_FILE = 'data/result.pth'
+
 class SimpleRegressor(nn.Module):
     def __init__(self):
         super(SimpleRegressor, self).__init__()
-        self.linear = nn.Linear(4, 2)  # 4 entradas para 2 saídas
+        self.linear = nn.Linear(4, 2)
 
     def forward(self, x):
         return self.linear(x)
+
+# ----------------------------
 
 app = Flask(__name__)
 model = SimpleRegressor()
 
 @app.route('/train', methods=['GET'])
 def train():
-    X, y = load_and_prepare_data('enemies_data.txt')
+    X, y = load_and_prepare_data(DATASET_FILE)
 
     dataset = TensorDataset(X, y)
     train_loader = DataLoader(dataset=dataset, batch_size=64, shuffle=True)
@@ -27,7 +33,7 @@ def train():
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     model.train()
-    for epoch in range(100):  # Número de épocas
+    for epoch in range(100):
         for inputs, targets in train_loader:
             optimizer.zero_grad()
             outputs = model(inputs)
@@ -35,16 +41,16 @@ def train():
             loss.backward()
             optimizer.step()
 
-    torch.save(model.state_dict(), 'data/result.pth')
-    return jsonify({'message': 'Treinada'})
+    torch.save(model.state_dict(), RESULT_FILE)
+    return jsonify({'message': 'Done!'})
 
 @app.route('/validate', methods=['GET'])
 def validate():
-    X_val, y_val = load_and_prepare_data('enemies_data_validate.txt')
+    X_val, y_val = load_and_prepare_data(DATASET_VALIDATE_FILE)
     val_dataset = TensorDataset(X_val, y_val)
     val_loader = DataLoader(dataset=val_dataset, batch_size=64, shuffle=False)
 
-    model.load_state_dict(torch.load('data/result.pth'))
+    model.load_state_dict(torch.load(RESULT_FILE))
     model.eval()
 
     total_loss = 0.0
@@ -62,7 +68,7 @@ def validate():
 
 @app.route('/predict', methods=['GET'])
 def predict():
-    model.load_state_dict(torch.load('data/result.pth'))
+    model.load_state_dict(torch.load(RESULT_FILE))
     model.eval()
 
     try:

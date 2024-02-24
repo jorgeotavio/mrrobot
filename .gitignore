@@ -1,3 +1,2 @@
 *.class
-enemies_data.txt
-enemies_data_validate.txt
+__pycache__
